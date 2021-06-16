@@ -17,7 +17,7 @@ namespace Hefferon.Core.Mail
 
         int _port;
         string _host;
-        string _user; 
+        string _user;
         string _password;
         bool _enableSsl;
 
@@ -55,50 +55,100 @@ namespace Hefferon.Core.Mail
         /// <param name="BCC"></param>
         public void Send(string from, List<string> to, string subject, string body, List<Attachment> attachments = null, List<string> BCC = null)
         {
-            System.Net.Mail.SmtpClient client = new System.Net.Mail.SmtpClient
+            try
             {
-                Port = _port,
-                Host = _host,
-                Timeout = 30,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(
-                _user,
-                _password)
-            };
-
-            client.EnableSsl = _enableSsl;
-
-
-            MailMessage mailMessage = new MailMessage();
-
-            foreach (string mailAddress in to)
-            {
-                mailMessage.To.Add(new MailAddress(mailAddress));
-            }
-
-            if (BCC != null)
-            {
-                foreach (string mailAddress in BCC)
+                System.Net.Mail.SmtpClient client = new System.Net.Mail.SmtpClient
                 {
-                    mailMessage.Bcc.Add(new MailAddress(mailAddress));
-                }
-            }
+                    Port = _port,
+                    Host = _host,
+                    Timeout = 12000,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(
+                    _user,
+                    _password)
+                };
 
-            mailMessage.From = new MailAddress(from);
-            mailMessage.Subject = subject;
-            mailMessage.IsBodyHtml = true;
-            mailMessage.Body = body;
+                client.EnableSsl = _enableSsl;
 
-            if (attachments != null && attachments.Count > 0)
-            {
-                foreach (Attachment attachment in attachments)
+
+                MailMessage mailMessage = new MailMessage();
+
+                foreach (string mailAddress in to)
                 {
-                    mailMessage.Attachments.Add(attachment);
+                    mailMessage.To.Add(new MailAddress(mailAddress));
                 }
-            }
 
-            client.Send(mailMessage);
+                if (BCC != null)
+                {
+                    foreach (string mailAddress in BCC)
+                    {
+                        mailMessage.Bcc.Add(new MailAddress(mailAddress));
+                    }
+                }
+
+                mailMessage.From = new MailAddress(from);
+                mailMessage.Subject = subject;
+                mailMessage.IsBodyHtml = true;
+                mailMessage.Body = body;
+
+                if (attachments != null && attachments.Count > 0)
+                {
+                    foreach (Attachment attachment in attachments)
+                    {
+                        mailMessage.Attachments.Add(attachment);
+                    }
+                }
+
+                client.Send(mailMessage);
+            }
+            catch (TimeoutException t)
+            {
+                System.Net.Mail.SmtpClient client = new System.Net.Mail.SmtpClient
+                {
+                    Port = _port,
+                    Host = _host,
+                    Timeout = 12000,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(
+    _user,
+    _password)
+                };
+
+                client.EnableSsl = _enableSsl;
+
+
+                MailMessage mailMessage = new MailMessage();
+
+                foreach (string mailAddress in to)
+                {
+                    mailMessage.To.Add(new MailAddress(mailAddress));
+                }
+
+                if (BCC != null)
+                {
+                    foreach (string mailAddress in BCC)
+                    {
+                        mailMessage.Bcc.Add(new MailAddress(mailAddress));
+                    }
+                }
+
+                mailMessage.From = new MailAddress(from);
+                mailMessage.Subject = subject;
+                mailMessage.IsBodyHtml = true;
+                mailMessage.Body = body;
+
+                if (attachments != null && attachments.Count > 0)
+                {
+                    foreach (Attachment attachment in attachments)
+                    {
+                        mailMessage.Attachments.Add(attachment);
+                    }
+                }
+
+                client.Send(mailMessage);
+            }
         }
 
         #endregion // ISmtpClient Members
